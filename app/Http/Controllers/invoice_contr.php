@@ -17,6 +17,16 @@ use Illuminate\Support\Facades\DB;
 
 class invoice_contr extends Controller
 {
+    public function destroy($id)
+    {
+        try {
+            $invoice = Invoice::findOrFail($id);
+            $invoice->delete();
+            return redirect()->route('invoices.index')->with('success', 'Facture supprimée avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->route('invoices.index')->with('error', 'Erreur lors de la suppression de la facture: ' . $e->getMessage());
+        }
+    }
     function invoice_form(){
        
         $latestClientsData=Client::select('user_id', DB::raw('MAX(created_at) as latest_created_at'))
@@ -70,7 +80,7 @@ class invoice_contr extends Controller
                 $item->invoice_id = $invoice->id;
                 $item->save();
             }
-            return redirect()->back()->with('success', 'Invoice created successfully');
+            return redirect()->back()->with('success', 'Facture créée avec succés');
 
 
         }else return redirect()->back()->with('error', 'ereur');
@@ -141,7 +151,7 @@ class invoice_contr extends Controller
 function detail_invoice(Request $request,$type,$id)
 {   
     
-    if($type=='sent'){
+    if($type=='recieved'){
         $invoice=received_invoice::findOrfail($id);
         $invoice_item = received_invoice_item::where('received_invoice_id', $invoice->id)->get();
     }
@@ -191,6 +201,22 @@ function detail_invoice(Request $request,$type,$id)
 
     // Retourne le PDF en tant que téléchargement
     return $pdf->stream('invoice_' . $invoice->id . '.pdf');
+}
+
+public function show($id)
+{
+    $invoice = Invoice::findOrFail($id);
+    return view('invoices.show', compact('invoice'));
+}
+public function edit($id)
+{
+    $invoice = Invoice::findOrFail($id);
+    return view('invoices.edit', compact('invoice'));
+}
+public function index()
+{
+    $invoices = Invoice::all(); // or paginate, etc.
+    return view('invoices.index', compact('invoices'));
 }
 
 

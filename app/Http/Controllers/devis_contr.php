@@ -14,26 +14,38 @@ use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 
 class devis_contr extends Controller
 {
-    function devis_form(){
-       
-        $latestClientsData=client::select('user_id', DB::raw('MAX(created_at) as latest_created_at'))
-                    ->groupby('user_id')->get();
+    public function destroy($id)
+    {
+        try {
+            \Log::info('Données reçues dans destroy : ' . print_r($id, true));
     
-        $userIds = $latestClientsData->pluck('user_id');
-        $latestCreatedAts = $latestClientsData->pluck('latest_created_at');
-
-        $client = Client::whereIn('user_id', $userIds)
-                       ->whereIn('created_at', $latestCreatedAts)
-                       ->get();
-
-        $companyinfo=companyinfo::all();
-        return view('devis_form',compact('client','companyinfo'));
+            // Si $id est une chaîne JSON, décodez-la
+            if (is_string($id) && strpos($id, '{') !== false) {
+                $devisData = json_decode($id, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $id = $devisData['id'] ?? null;
+                }
+            }
+    
+            \Log::info('ID extrait : ' . print_r($id, true));
+    
+            // Vérifiez si $id est défini et numérique
+            if (!isset($id) || !is_numeric($id)) {
+                throw new \Exception("ID de devis invalide ou manquant");
+            }
+    
+            $devis = Devis::findOrFail($id);
+            $devis->delete();
+            return redirect()->route('devis.index')->with('success', 'Devis supprimé avec succès.');
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la suppression du devis : ' . $e->getMessage());
+            return redirect()->route('devis.index')->with('error', 'Erreur lors de la suppression du devis: ' . $e->getMessage());
+        }
     }
+    
 
 
-
-
-    function save_devis_admin(Request $request){
+    public function save_devis_admin(Request $request){
         $request->validate([
             'date' => 'required|date',
            
@@ -67,7 +79,7 @@ class devis_contr extends Controller
                 $item->devis_id = $devis->id;
                 $item->save();
             }
-            return redirect()->back()->with('success', 'created successfully');
+            return redirect()->back()->with('success', 'Devis créé avec succès');
 
 
         }else return redirect()->back()->with('error', 'ereur');
@@ -76,15 +88,18 @@ class devis_contr extends Controller
 
 
 
-    function devis_form_client(){
-   
-        $companyinfo=companyinfo::all();
-        return view('devis_form_client',compact('companyinfo'));
+     public function devis_form_client(){
+        // Fetch clients from the database
+    $client = Client::all(); // Assuming you have a Client model
+    $companyinfo=companyinfo::all();
+
+    // Pass the clients to the view
+        return view('devis_form_client',compact('client','companyinfo'));
     }
 
 
     
-    public function save_devis_client(Request $request){
+     public function save_devis_client(Request $request){
       
         $request->validate([
             'date' => 'required|date',
@@ -135,10 +150,10 @@ class devis_contr extends Controller
 }
 
 
-function detail_devis(Request $request,$type,$id)
+public function detail_devis(Request $request,$type,$id)
 {   
     
-    if($type=='sent'){
+    if($type=='recieved'){
         $devis=devis_recu::findOrfail($id);
         $devis_item = devis_recu_item::where('devis_recu_id', $devis->id)->get();
     }
@@ -191,9 +206,19 @@ function detail_devis(Request $request,$type,$id)
 }
 
 
-
-
-
-
-
+ public function show($id)
+{
+    $invoice = Devis::findOrFail($id);
+    return view('devis.show', compact('devis'));
 }
+ public function edit($id)
+{
+    $invoice = Devis::findOrFail($id);
+    return view('devis.edit', compact('devis'));
+}
+ public function index()
+{
+    $devisList = Devis::with('client')->get(); // Fetch the list of devis with client details
+    $devis = Devis::all(); // or paginate, etc.
+    return view('devis.index', compact('devis', 'devisList'));
+}}

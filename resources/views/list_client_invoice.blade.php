@@ -7,8 +7,8 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Invoices</h2>
     <select id="filter-select" class="form-select form-select-sm" style="width: auto;">
-        <option value="all" >all</option>
-        <option value="received"  >Reçues</option>
+        <option value="all">all</option>
+        <option value="received">Reçues</option>
         <option value="sent">Envoyées</option>
     </select>
 </div>

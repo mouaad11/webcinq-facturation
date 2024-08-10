@@ -21,10 +21,19 @@ class sign_up_request extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email','regex:/^[^@]+@[^@]+\.[^@]+$/'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email', 'regex:/^[^@]+@[^@]+\.[^@]+$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
+    
+        if ($this->has('usertype')) {
+            $rules['usertype'] = ['required', 'in:admin,user'];
+        }
+        if ($this->has('uservalid')) {
+            $rules['uservalid'] = ['required', 'in:v,nv'];
+        }
+    
+        return $rules;
     }
 }

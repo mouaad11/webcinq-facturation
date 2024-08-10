@@ -30,9 +30,9 @@
 						<div class="text-center mt-4">
 							<img src="{{ asset('/webcinq_logo.png') }}" height="70" alt="webcinq" loading="lazy" />
 
-							<h1 class="h2">Créer un compte pour un utilisateur</h1>
+							<h1 class="h2">Commencer</h1>
 							<p class="lead">
-								En tant qu'admin, vous pouvez créer un compte pour un nouveau utilisateur/client.
+								Commence à profiter du meilleure service de gestion de facturation.
 							</p>
 						</div>
 
@@ -43,52 +43,31 @@
 										@csrf
 										<div class="mb-3">
 											<label class="form-label">Nom complet</label>
-											<input class="form-control form-control-lg" type="text" name="name" placeholder="Entrer votre nom complet" required/>
+											<input class="form-control form-control-lg" type="text" name="name" placeholder="Entrer votre nom complet" />
+										</div>
+
+										<div class="mb-3">
+											<label class="form-label">Téléphone</label>
+											<input class="form-control form-control-lg" type="number" name="tel" placeholder="Entrer votre numéro de téléphone" />
+										</div>
+										<div class="mb-3">
+											<label class="form-label">Adresse</label>
+											<input class="form-control form-control-lg" type="textarea" name="adress" placeholder="Entrer votre adresse complète" />
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" placeholder="Entrer votre email" required/>
+											<input class="form-control form-control-lg" type="email" name="email" placeholder="Entrer votre email" />
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Mot de passe</label>
-											<input class="form-control form-control-lg" type="password" name="password" placeholder="Entrer le mot de passe" required/>
+											<input class="form-control form-control-lg" type="password" name="password" placeholder="Entrer le mot de passe" />
 										</div>
 										<div class="mb-3">
 											<label class="form-label">Confirmer Mot de passe</label>
-											<input class="form-control form-control-lg" type="password" name="password_confirmation" placeholder="Confirmer le mot de passe" required/>
-										</div>
-										<div class="mb-3">
-											<label class="form-label">Type de compte</label>
-											<div class="form-check">
-												<input class="form-check-input" type="radio"  name="usertype" value="admin" required>
-												<label class="form-check-label" for="admin">
-													Admin
-												</label>
-											</div>
-											<div class="form-check">
-												<input class="form-check-input" type="radio" name="usertype" value="user" checked required>
-												<label class="form-check-label" for="user">
-													Client
-												</label>
-											</div>
-										</div>
-										<div class="mb-3">
-											<label class="form-label">Validation du compte</label>
-											<div class="form-check">
-												<input class="form-check-input" type="radio"  name="uservalid" value="v" required>
-												<label class="form-check-label" for="admin">
-													Validé
-												</label>
-											</div>
-											<div class="form-check">
-												<input class="form-check-input" type="radio" name="uservalid" value="nv" checked required>
-												<label class="form-check-label" for="user">
-													Non validé
-												</label>
-											</div>
+											<input class="form-control form-control-lg" type="password" name="password_confirmation" placeholder="Confirmer le mot de passe" />
 										</div>
 										<div class="d-grid gap-2 mt-3">
-											<button class="btn btn-lg btn-primary">Creer le nouveau compte</button>
+											<button class="btn btn-lg btn-primary">Creer votre compte</button>
 										</div>
 									</form>
 									@if ($errors->any())

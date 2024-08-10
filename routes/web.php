@@ -7,11 +7,13 @@ use App\Http\Controllers\home_contr;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\invoice;
 use App\Http\Controllers\invoice_contr;
+use App\Http\Controllers\company_contr;
 use App\Http\Controllers\login_contr;
 use App\Http\Controllers\profile_contr;
 use App\Http\Controllers\sign_up_contr;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DevisContr;
 
 
 Route::get('/', function () {
@@ -29,7 +31,7 @@ Route::get('/', function () {
 
 
 // Admin dashboard route
-Route::get('/dashboard', [admin_contr::class, 'index'])->name('dashboard')->middleware('auth');
+Route::get('/dashboard', [admin_contr::class, 'index'])->middleware(['auth', 'admin'])->name('dashboard')->middleware('auth');
 
 // Client home route
 Route::get('/home', [client_contr::class, 'index'])->name('home');
@@ -88,7 +90,11 @@ Route::get('/list_client_invoice/{id}',[admin_contr::class,'list_client_invoice'
 Route::get('/sort_client_invoice',[admin_contr::class,'sort_client_invoice'])->middleware('auth')->name('sort_client_invoice');
 
 
-Route::match(['get', 'post'],'/devis', [devis_contr::class, 'devis_form'])->middleware(['auth', 'admin'])->name('devis_form');
+
+
+Route::match(['get', 'post'], '/devis', [DevisContr::class, 'devis_form_admin'])
+    ->middleware(['auth', 'admin'])
+    ->name('devis_form_admin');
 Route::post('/save_devis_admin', [devis_contr::class, 'save_devis_admin'])->name('save_devis_admin');
 
 Route::match(['get', 'post'],'/devis_client', [devis_contr::class, 'devis_form_client'])->name('devis_form_client');
@@ -113,3 +119,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/unread-messages', [MessageController::class, 'getUnreadMessages']);
 });
+
+//show more table routes
+Route::get('/invoices/{id}', [invoice_contr::class, 'show'])->name('invoices.show');
+Route::get('/invoices/{id}/edit', [invoice_contr::class, 'edit'])->name('invoices.edit');
+Route::get('/invoices', [invoice_contr::class, 'index'])->name('invoices.index');
+Route::get('/clients', [client_contr::class, 'indexShowAll'])->name('clients.indexShowAll');
+Route::get('/companies', [company_contr::class, 'index'])->name('companies.index');
+Route::get('/devis/{id}', [devis_contr::class, 'show'])->name('devis.show');
+Route::get('/devis/{id}/edit', [devis_contr::class, 'edit'])->name('devis.edit');
+Route::get('/devis', [devis_contr::class, 'index'])->name('devis.index');
+
+//delete actions
+Route::delete('/invoices/{id}', [invoice_contr::class, 'destroy'])->name('invoices.destroy');
+Route::delete('/devis/{id}', [devis_contr::class, 'destroy'])->name('devis.destroy');

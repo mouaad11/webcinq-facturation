@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\admin_update_request;
 use App\Http\Requests\update_request;
 use App\Models\client;
+use App\Models\InvoiceItem;
 use App\Models\companyinfo;
 use App\Models\devis;
 use App\Models\devis_recu;
@@ -16,13 +17,110 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class admin_contr extends Controller
 {
     public function index()
     {
-        return view('dashboard'); // Ensure you have a view at resources/views/admin/dashboard.blade.php
+        $recentInvoices = Invoice::with(['client', 'companyinfo', 'invoice_items'])
+        ->latest()
+        ->take(7)
+        ->get();
+
+    $clients = Client::withCount('invoices')
+        ->orderByDesc('invoices_count')
+        ->take(7)
+        ->get();
+
+    $companies = Companyinfo::withCount('invoices')
+        ->orderByDesc('invoices_count')
+        ->take(7)
+        ->get();
+
+    $recentQuotes = Devis::with(['client', 'companyinfo', 'devis_items'])
+        ->latest()
+        ->take(7)
+        ->get();
+
+    $totalInvoices = Invoice::count();
+    $totalPaidAmount = Invoice::where('status', 'paid')->sum('total_amount');
+    $totalUnpaidAmount = Invoice::where('status', 'unpaid')->sum('total_amount');
+    $averageInvoiceValue = Invoice::avg('total_amount');
+
+    // Calculate growth percentages (you might want to adjust the time period)
+    $lastMonth = Carbon::now()->subMonth();
+    $invoiceGrowth = $this->calculateGrowth(Invoice::class, $lastMonth);
+    $paidGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['status' => 'paid']);
+    $unpaidGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['status' => 'unpaid']);
+    $averageGrowth = $this->calculateAverageGrowth(Invoice::class, $lastMonth);
+
+    // Calculate percentages for pie chart
+    $totalInvoiceCount = Invoice::count();
+    $paidCount = Invoice::where('status', 'paid')->count();
+    $paidPercentage = ($totalInvoiceCount > 0) ? round(($paidCount / $totalInvoiceCount) * 100, 2) : 0;
+    $unpaidPercentage = 100 - $paidPercentage;
+
+    // Get monthly revenue data for line chart
+    $monthlyRevenue = $this->getMonthlyRevenue();
+
+    return view('dashboard', compact(
+        'recentInvoices',
+        'clients',
+        'companies',
+        'recentQuotes',
+        'totalInvoices',
+        'totalPaidAmount',
+        'totalUnpaidAmount',
+        'averageInvoiceValue',
+        'invoiceGrowth',
+        'paidGrowth',
+        'unpaidGrowth',
+        'averageGrowth',
+        'paidPercentage',
+        'unpaidPercentage',
+        'monthlyRevenue'
+    ));
+    return view('dashboard'); // Ensure you have a view at resources/views/admin/dashboard.blade.php
+
     }
+    private function calculateGrowth($model, $date, $conditions = [])
+{
+    $currentCount = $model::where($conditions)->count();
+    $previousCount = $model::where($conditions)->where('created_at', '<', $date)->count();
+    
+    if ($previousCount > 0) {
+        return round((($currentCount - $previousCount) / $previousCount) * 100, 2);
+    }
+    
+    return 0;
+}
+
+private function calculateAverageGrowth($model, $date)
+{
+    $currentAvg = $model::where('created_at', '>=', $date)->avg('total_amount');
+    $previousAvg = $model::where('created_at', '<', $date)->avg('total_amount');
+    
+    if ($previousAvg > 0) {
+        return round((($currentAvg - $previousAvg) / $previousAvg) * 100, 2);
+    }
+    
+    return 0;
+}
+
+private function getMonthlyRevenue()
+{
+    return Invoice::select(
+        DB::raw('SUM(total_amount) as revenue'),
+        DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month")
+    )
+    ->where('created_at', '>=', Carbon::now()->subYear())
+    ->groupBy('month')
+    ->orderBy('month')
+    ->get()
+    ->pluck('revenue', 'month')
+    ->toArray();
+}
     function admin_list_acc(){
         if (Auth::check() && Auth::user()->usertype === 'admin') {
 

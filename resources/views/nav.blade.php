@@ -19,9 +19,9 @@
       </button>
       
       
-
-      <a class="navbar-brand mt-2 mt-lg-0" href="{{route('home')}}">
-        <img src="{{ asset('/webcinq_logo.png') }}" height="30" alt="webcinq" loading="lazy" />
+      
+      <a class="navbar-brand mt-2 mt-lg-0" href="{{ Auth::user()->isAdmin() ? route('dashboard') : route('home') }}">
+        <img src="{{ asset('/webcinq_logo.png') }}" height="50" alt="webcinq" loading="lazy" />
       </a>
 
 

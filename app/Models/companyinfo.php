@@ -17,4 +17,9 @@ class companyinfo extends Model
         'email',
         'tax_id',
     ];
+        // Define the relationship
+        public function invoices()
+        {
+            return $this->hasMany(Invoice::class);
+        }
 }
