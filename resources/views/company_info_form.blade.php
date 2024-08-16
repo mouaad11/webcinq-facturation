@@ -1,6 +1,10 @@
 @extends('template')
 
-@section('contenu')
+
+@section('title', 'Toutes les entreprises') 
+<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
+
+@section('content')
 
     <button id="showCompanyFormBtn" class="btn btn-secondary mt-3">Ajouter des informations sur l'entreprise</button>
 

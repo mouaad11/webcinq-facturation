@@ -1,9 +1,10 @@
+
 @extends('template')
 
-@section('contenu')
+@section('title', 'Modifier les informations du client') 
+<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
-
-
+@section('content')
    
  <div class="container-fluid">
     <div class="row justify-content-center mt-5">

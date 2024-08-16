@@ -1,3 +1,4 @@
+<!--This login view is not being used, go to /auth-->
 @extends('template')
 
 @section('login_sign')

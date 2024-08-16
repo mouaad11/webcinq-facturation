@@ -210,9 +210,71 @@ public function show($id)
 }
 public function edit($id)
 {
+    $latestClientsData=Client::select('user_id', DB::raw('MAX(created_at) as latest_created_at'))
+    ->groupby('user_id')->get();
+
+    $userIds = $latestClientsData->pluck('user_id');
+    $latestCreatedAts = $latestClientsData->pluck('latest_created_at');
+
+    $client = Client::whereIn('user_id', $userIds)
+        ->whereIn('created_at', $latestCreatedAts)
+        ->get();
+
+    $companyinfos = Companyinfo::all();
     $invoice = Invoice::findOrFail($id);
-    return view('invoices.edit', compact('invoice'));
+    $invoice_item = invoice_item::where('invoice_id', $invoice->id)->get(); // Assuming invoice_item is your model
+return view('invoices.edit', compact('invoice', 'client', 'companyinfos', 'invoice_item'));
+
 }
+
+public function update(Request $request, $id)
+{
+    // Validate the request data
+    $validatedData = $request->validate([
+        'date' => 'required|date',
+        'due_date' => 'required|date',
+        'client_id' => 'required|integer',
+        'company_id' => 'required|integer',
+        'status' => 'required|string',
+        'descriptions' => 'required|array',
+        'quantities' => 'required|array',
+        'unit_prices' => 'required|array',
+        'tvas' => 'required|array',
+    ]);
+
+    // Find the invoice by its ID
+    $invoice = Invoice::findOrFail($id);
+
+    // Update the invoice's main information
+    $invoice->date = $request->input('date');
+    $invoice->due_date = $request->input('due_date');
+    $invoice->client_id = $request->input('client_id');
+    $invoice->companyinfo_id = $request->input('company_id');
+    $invoice->status = $request->input('status');
+    $invoice->save();
+
+    // Delete old invoice items
+    invoice_item::where('invoice_id', $id)->delete();
+
+    // Add updated items
+    $descriptions = $request->input('descriptions');
+    $quantities = $request->input('quantities');
+    $unit_prices = $request->input('unit_prices');
+    $tvas = $request->input('tvas');
+
+    foreach ($descriptions as $key => $description) {
+        $item = new invoice_item();
+        $item->invoice_id = $invoice->id;
+        $item->description = $description;
+        $item->quantity = $quantities[$key];
+        $item->unit_price = $unit_prices[$key];
+        $item->tva = $tvas[$key];
+        $item->save();
+    }
+
+    return redirect()->route('dashboard')->with('success', 'Invoice updated successfully!');
+}
+
 public function index()
 {
     $invoices = Invoice::all(); // or paginate, etc.

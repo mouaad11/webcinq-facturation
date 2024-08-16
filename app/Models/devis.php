@@ -25,13 +25,19 @@ public function companyinfo()
     return $this->belongsTo(Companyinfo::class);
 }
 
-public function invoice_items()
+
+    public function devis_items()
+    {
+        return $this->hasMany(devis_items::class, 'devis_id');
+    }
+
+
+
+public function updateTotalAmount()
 {
-    return $this->hasMany(invoice_item::class);
+    $this->total_amount = $this->devis_items->sum(function ($item) {
+        return $item->quantity * $item->unit_price;
+    });
+    $this->save();
 }
-   // Define the relationship
-   public function devis_items()
-   {
-       return $this->hasMany(devis_items::class);
-   }
 }

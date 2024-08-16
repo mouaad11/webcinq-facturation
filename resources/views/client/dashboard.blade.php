@@ -9,7 +9,7 @@
     <meta name="author" content="Webcinq">
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
+    <link rel="shortcut icon" href="../../img/icons/icon-48x48.png" />
 
     <title>Webcinq - Tableau de bord Client</title>
 
@@ -22,8 +22,8 @@
         <nav id="sidebar" class="sidebar js-sidebar">
             <div class="sidebar-content js-simplebar">
                 <a class="sidebar-brand" href="{{ '/client-dashboard' }}">
-                    <img src="{{ asset('/webcinq_logo.png') }}" height="30" alt="webcinq" loading="lazy" />
-                    <span class="align-middle">Client</span>
+                    <img src="{{ asset('/webcinq_logo.png') }}" height="40" alt="webcinq" loading="lazy" />
+                    <span class="align-bottom">Client</span>
                 </a>
 
                 <ul class="sidebar-nav">
@@ -44,8 +44,8 @@
                     </li>
 
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('login') }}">
-                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Changer de compte</span>
+                        <a class="sidebar-link" href="{{ route('logout') }}">
+                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Se déconnecter</span>
                         </a>
                     </li>
 
@@ -124,7 +124,7 @@
                             </a>
 
                             <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                                <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1" alt="profil" /> <span class="text-dark">{{ Auth::user()->name }}</span>
+                                <img src="../img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1" alt="profil" /> <span class="text-dark">{{ Auth::user()->name }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="{{route('setting')}}"><i class="align-middle me-1" data-feather="user"></i> Profil</a>
@@ -161,7 +161,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h1 class="mt-1 mb-3">{{ $totalClientInvoices }}</h1>
+                                                <h1 class="mt-1 mb-3">{{ $totalInvoices }}</h1>
                                             </div>
                                         </div>
                                         <div class="card">
@@ -176,7 +176,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h1 class="mt-1 mb-3">{{ number_format($totalClientPaidAmount, 2) }} DH</h1>
+                                                <h1 class="mt-1 mb-3">{{ number_format($totalPaidAmount, 2) }} DH</h1>
                                             </div>
                                         </div>
                                     </div>
@@ -193,7 +193,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h1 class="mt-1 mb-3">{{ number_format($totalClientUnpaidAmount, 2) }} DH</h1>
+                                                <h1 class="mt-1 mb-3">{{ number_format($totalUnpaidAmount, 2) }} DH</h1>
                                             </div>
                                         </div>
                                         <div class="card">
@@ -250,7 +250,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($recentClientInvoices as $invoice)
+                                            @foreach($recentInvoices as $invoice)
                                             <tr>
                                                 <td>{{ $invoice->id }}</td>
                                                 <td>{{ number_format($invoice->total_amount, 2) }} DH</td>
@@ -277,46 +277,56 @@
                     </div>
 
                     <!-- Recent Quotes Table -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">Devis Récents</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-hover my-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Numéro de Devis</th>
-                                                <th>Montant</th>
-                                                <th>Date</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($recentClientQuotes as $quote)
-                                            <tr>
-                                                <td>{{ $quote->id }}</td>
-                                                <td>{{ number_format($quote->total_amount, 2) }} DH</td>
-                                                <td>{{ $quote->date instanceof \Carbon\Carbon ? $quote->date->format('d/m/Y') : $quote->date }}</td>
-                                                <td>
-                                                    <a href="{{ route('detail_devis', ['type' => 'sent', 'id' => $quote->id]) }}" class="btn btn-sm btn-primary">Voir</a>
-                                                    <form action="{{ route('client.devis.accept', $quote->id) }}" method="POST" style="display:inline;">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Êtes-vous sûr de vouloir accepter ce devis?')">Accepter</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                    <div class="text-center mt-3">
-                                        <a href="{{ route('client.devis.index') }}" class="btn btn-primary">Voir tous les devis</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Devis Récents</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover my-0">
+                    <thead>
+                        <tr>
+                            <th>Numéro de Devis</th>
+                            <th>Montant</th>
+                            <th>Date</th>
+                            <th>Status</th> <!-- Add this line -->
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($recentQuotes as $quote)
+                        <tr>
+                            <td>{{ $quote->id }}</td>
+                            <td>{{ number_format($quote->total_amount, 2) }} DH</td>
+                            <td>{{ $quote->date instanceof \Carbon\Carbon ? $quote->date->format('d/m/Y') : $quote->date }}</td>
+                            <td>
+                                @if($quote->status == 'Accepté')
+                                    <span class="badge bg-success">{{ $quote->status }}</span>
+                                @else
+                                    <span class="badge bg-danger">{{ $quote->status }}</span>
+                                @endif
+                            </td>                            <td>
+                                <a href="{{ route('detail_devis', ['type' => 'sent', 'id' => $quote->id]) }}" class="btn btn-sm btn-primary">Voir</a>
+                                @if($quote->status == 'Non Accepté')
+                                <form action="{{ route('client.devis.accept', $quote->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Êtes-vous sûr de vouloir accepter ce devis?')">Accepter</button>
+                                </form>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div class="text-center mt-3">
+                    <a href="{{ route('client.devis.index') }}" class="btn btn-primary">Voir tous les devis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
                 </div>
             </main>
 
@@ -351,7 +361,7 @@
                 data: {
                     labels: ["Payées", "Non Payées"],
                     datasets: [{
-                        data: [{{ $clientPaidPercentage }}, {{ $clientUnpaidPercentage }}],
+                        data: [{{ $paidPercentage }}, {{ $unpaidPercentage }}],
                         backgroundColor: [
                             window.theme.success,
                             window.theme.danger
@@ -363,8 +373,15 @@
                     responsive: !window.MSInputMethodContext,
                     maintainAspectRatio: false,
                     legend: {
-                        display: false
-                    },
+                    display: true, // Enable the legend
+                    position: 'bottom', // Position of the legend (bottom, top, left, right)
+                    labels: {
+                        boxWidth: 20, // Width of the color box
+                        padding: 15,  // Padding between legend items
+                        fontSize: 14, // Font size for legend text
+                        fontColor: '#333', // Font color for legend text
+                    }
+                },
                     cutoutPercentage: 75
                 }
             });
@@ -391,7 +408,7 @@
                             <a href="#" class="list-group-item">
                                 <div class="row g-0 align-items-center">
                                     <div class="col-2">
-                                        <img src="img/avatars/avatar-2.jpg" class="avatar img-fluid rounded-circle" alt="${message.sender.name}">
+                                        <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded-circle" alt="${message.sender.name}">
                                     </div>
                                     <div class="col-10 ps-2">
                                         <div class="text-dark">${message.sender.name} <i>${message.sender.role}</i></div>

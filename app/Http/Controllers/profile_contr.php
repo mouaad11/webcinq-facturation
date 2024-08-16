@@ -51,13 +51,9 @@ class profile_contr extends Controller
 
         $id=Auth::user()->id;
         $client = Client::where('user_id', $id)->latest()->first();
-        if ($client) {
+      
             return view('client_information',compact('client'));
 
-                     }
-         else
-            {return view('client_information');}
-        
        
             
         
@@ -65,42 +61,28 @@ class profile_contr extends Controller
     }
 
 
-    function add_update_information(Request $request){
-        $id=Auth::user()->id;
-          /*
-        $client = client::where('user_id', $id)->first();
-     
-        if ($client) {
-          
-            $client->name = $request->name;
-            $client->address = $request->address;
-            $client->tel = $request->tel;
-            $client->user_id =$id;
-            $client->save();
-        
-            return to_route('information')->with('success', 'Client mis à jour avec succès.');
-        } else {
-           
-            Client::create([
-                'name' => $request->name,
-                'address' => $request->address,
-                'tel' => $request->tel,
-                'user_id' => $id,
-            ]);
-        
-            return to_route('information')->with('success', 'Client ajouté avec succès.');
-        }
-        */
+    function add_update_information(Request $request)
+{
+    $id = Auth::user()->id;
 
-        Client::create([
-            'name' => $request->name,
-            'address' => $request->address,
-            'tel' => $request->tel,
-            'user_id' => $id,
-        ]);
-    
-        return to_route('information')->with('success', 'Client ajouté avec succès.');
+    // Find the client associated with the current user
+    $client = Client::where('user_id', $id)->first();
+
+    if ($client) {
+        // If the client exists, update the existing record
+        $client->name = $request->name;
+        $client->address = $request->address;
+        $client->tel = $request->tel;
+        $client->save();
+
+        return to_route('information')->with('success', 'Client mis à jour avec succès.');
+    } else {
+        // If no client exists, create a new record
+        return to_route('information')->with('error', 'Client non trouvé.');
+
 
     }
+}
+
 
 }

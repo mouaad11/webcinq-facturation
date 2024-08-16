@@ -90,7 +90,7 @@ class devis_contr extends Controller
 
      public function devis_form_client(){
         // Fetch clients from the database
-    $client = Client::all(); // Assuming you have a Client model
+    $client = auth()->user()->client; // Assuming you have a Client model
     $companyinfo=companyinfo::all();
 
     // Pass the clients to the view
@@ -208,13 +208,70 @@ public function detail_devis(Request $request,$type,$id)
 
  public function show($id)
 {
-    $invoice = Devis::findOrFail($id);
+    $devis = Devis::findOrFail($id);
     return view('devis.show', compact('devis'));
 }
- public function edit($id)
+public function edit($id)
 {
-    $invoice = Devis::findOrFail($id);
-    return view('devis.edit', compact('devis'));
+    $latestClientsData = Client::select('user_id', DB::raw('MAX(created_at) as latest_created_at'))
+        ->groupBy('user_id')->get();
+
+    $userIds = $latestClientsData->pluck('user_id');
+    $latestCreatedAts = $latestClientsData->pluck('latest_created_at');
+
+    $client = Client::whereIn('user_id', $userIds)
+        ->whereIn('created_at', $latestCreatedAts)
+        ->get();
+
+        $companyinfos = Companyinfo::all();
+        $devis = Devis::findOrFail($id);
+    $devis_items = $devis->devis_items; // Fetch related items
+
+    return view('devis.edit', compact('devis', 'client', 'companyinfos', 'devis_items'));
+}
+
+public function update(Request $request, $id)
+{
+    // Validate the request data
+    $validatedData = $request->validate([
+        'date' => 'required|date',
+        'client_id' => 'required|integer',
+        'company_id' => 'required|integer',
+        'descriptions' => 'required|array',
+        'quantities' => 'required|array',
+        'unit_prices' => 'required|array',
+        'tvas' => 'required|array',
+    ]);
+
+    // Find the devis by its ID
+    $devis = devis::findOrFail($id);
+
+    // Update the devis's main information
+    $devis->date = $request->input('date');
+    $devis->client_id = $request->input('client_id');
+    $devis->companyinfo_id = $request->input('company_id');
+    $devis->save();
+
+    // Delete old devis items
+    devis_items::where('devis_id', $id)->delete();
+
+    // Add updated items
+    $descriptions = $request->input('descriptions');
+    $quantities = $request->input('quantities');
+    $unit_prices = $request->input('unit_prices');
+    $tvas = $request->input('tvas');
+
+    foreach ($descriptions as $key => $description) {
+        $item = new devis_items();
+        $item->devis_id = $devis->id;
+        $item->description = $description;
+        $item->quantity = $quantities[$key];
+        $item->unit_price = $unit_prices[$key];
+        $item->tva = $tvas[$key];
+        $item->save();
+    }
+
+    return redirect()->route('dashboard')->with('success', 'devis updated successfully!');
 }
  public function index()
 {

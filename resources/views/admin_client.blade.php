@@ -1,37 +1,37 @@
+
 @extends('template')
 
-@section('contenu')
+@section('title', 'Modifier les informations du client') 
+<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
-
-
-<div class="container-fluid">
+@section('content')
+   
+ <div class="container-fluid">
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">client {{$id}} information    </div>
-                <form action="{{ route('add_update_client', ['id' => $id]) }}" method="POST">
+                <div class="card-header">client information    </div>
+                <form action="{{route('add_update_information')}}" method="POST">
                     @csrf
-                   
                     <div class="mb-3">
                         <label for="name" class="form-label">Nom</label>
-                        <input type="text" value="{{ isset($client) ? $client->name : '' }}" class="form-control" id="name" name="name" required>
+                        <input type="text" class="form-control" id="name" name="name" placeholder=""value="{{ isset($client) ? $client->name : '' }}" required>
                     </div>
+                   
                     <div class="mb-3">
-                        <label for="address" class="form-label">Adresse</label>
-                        <input type="text" value="{{ isset($client) ? $client->address : '' }}" class="form-control" id="address" name="address" required>
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" value="{{ isset($client) ? $client->address : '' }}" required>
                     </div>
                     <div class="mb-3">
                         <label for="tel" class="form-label">Téléphone</label>
-                        <input type="tel"  value="{{ isset($client) ? $client->tel : '' }}" class="form-control" id="tel" name="tel" required>
+                        <input type="tel" class="form-control" id="tel" name="tel" value="{{ isset($client) ? $client->tel : '' }}" required>
                     </div>
-                  
                     <button type="submit" class="btn btn-primary">{{ isset($client) ?'update' : 'add' }}</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 
  
 

@@ -1,6 +1,8 @@
 @extends('template')
+@section('title', 'Ajouter une facture')
+<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
-@section('contenu')
+@section('content')
 
 <div class="container">
     <div class="row justify-content-center mt-5">

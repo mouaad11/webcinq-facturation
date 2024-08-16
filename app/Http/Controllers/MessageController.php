@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class MessageController extends Controller
 {
@@ -17,8 +19,9 @@ class MessageController extends Controller
             ->get();
 
         $users = User::where('id', '!=', auth()->id())->get();
+        $currentUser = Auth::user();
 
-        return view('messages.index', compact('messages', 'users'));
+        return view('messages.index', compact('messages', 'users', 'currentUser'));
     }
 
     public function store(Request $request)
@@ -46,5 +49,13 @@ class MessageController extends Controller
             ->get();
 
         return response()->json($unreadMessages);
+    }
+    public function markAsRead(Message $message)
+    {
+        if ($message->receiver_id === auth()->id()) {
+            $message->update(['read_at' => now()]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
     }
 }

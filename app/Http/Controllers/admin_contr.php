@@ -110,16 +110,25 @@ private function calculateAverageGrowth($model, $date)
 
 private function getMonthlyRevenue()
 {
-    return Invoice::select(
-        DB::raw('SUM(total_amount) as revenue'),
-        DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month")
-    )
-    ->where('created_at', '>=', Carbon::now()->subYear())
-    ->groupBy('month')
-    ->orderBy('month')
-    ->get()
-    ->pluck('revenue', 'month')
-    ->toArray();
+    $monthlyRevenue = [];
+    $startDate = now()->startOfMonth();
+
+    for ($i = 0; $i < 12; $i++) {
+        $month = $startDate->copy()->addMonths($i);
+        $revenue = Invoice::whereYear('date', $month->year)
+                          ->whereMonth('date', $month->month)
+                          ->sum('total_amount');
+
+        // For future months, we'll use projected data or 0
+        if ($month->isFuture()) {
+            // You can implement your projection logic here
+            $revenue = 0; // or some projected value
+        }
+
+        $monthlyRevenue[$month->format('M Y')] = $revenue;
+    }
+
+    return $monthlyRevenue;
 }
     function admin_list_acc(){
         if (Auth::check() && Auth::user()->usertype === 'admin') {
@@ -216,19 +225,11 @@ private function getMonthlyRevenue()
     }
 
 
-    function client_information(Request $request,$id){
-      
+    function client_information(Request $request, $id){
         $client = Client::where('user_id', $id)->latest()->first();
-        
-        if ($client) {
-            return view('admin_client',compact('id','client'));
-
-                     }
-         else
-            {return view('admin_client',compact('id'));}
-        
+        return view('admin_client', compact('id', 'client'));
     }
-
+    
 
 
     function add_update_client(Request $request,$id){
@@ -408,6 +409,8 @@ function list_client_devis(Request $request,$id){
         return view('sort_devis',compact('devis')); 
                
     }
+
+    
     
 
 

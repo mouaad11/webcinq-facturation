@@ -1,4 +1,6 @@
-<!-- resources/views/companies/index.blade.php -->
+<!-- resources/views/companies/index.blade.php
+THIS VIEW IS NOT CURRENTLY BEING USED
+-->
 @extends('layouts.app')
 
 @section('content')

@@ -60,4 +60,8 @@ class User extends Authenticatable
 {
     return $this->hasMany(Message::class, 'receiver_id')->whereNull('read_at');
 }
+public function client()
+{
+    return $this->hasOne(Client::class);
+}
 }

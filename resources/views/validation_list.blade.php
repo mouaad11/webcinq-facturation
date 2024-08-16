@@ -1,7 +1,10 @@
-
 @extends('template')
 
-@section('contenu')
+
+@section('title', 'Demandes de validation')
+<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
+
+@section('content')
     
 <table class="table table-striped">
     <thead>

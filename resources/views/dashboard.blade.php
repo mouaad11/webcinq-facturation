@@ -10,8 +10,10 @@
     <meta name="keywords"
         content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="shortcut icon" href="img/icons/icon-48x48.png" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
     <link rel="canonical" href="https://demo-basic.adminkit.io/" />
 
@@ -26,9 +28,9 @@
         <nav id="sidebar" class="sidebar js-sidebar">
             <div class="sidebar-content js-simplebar">
                 <a class="sidebar-brand" href="{{ '/dashboard' }}">
-                    <img src="{{ asset('/webcinq_logo.png') }}" height="30" alt="webcinq" loading="lazy" />
+                    <img src="{{ asset('/webcinq_logo.png') }}" height="40" alt="webcinq" loading="lazy" />
 
-                    <span class="align-middle">Admin</span>
+                    <span class="align-bottom">Admin</span>
                 </a>
 
                 <ul class="sidebar-nav">
@@ -44,15 +46,14 @@
                     </li>
 
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="pages-profile.html">
+                        <a class="sidebar-link" href="{{route('setting')}}">
                             <i class="align-middle" data-feather="user"></i> <span class="align-middle">Profil</span>
                         </a>
                     </li>
 
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('login') }}">
-                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Changer de
-                                compte</span>
+                        <a class="sidebar-link" href="{{ route('logout') }}">
+                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Se déconnecter</span>
                         </a>
                     </li>
 
@@ -84,11 +85,25 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('clients.indexShowAll') }}">
+                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('company_info') }}">
                             <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des entreprises</span>
                         </a>
                     </li>
-
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('invoices.index') }}">
+                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des factures</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ route('devis.index') }}">
+                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des devis</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="sidebar-cta">
@@ -132,49 +147,86 @@
                                     <!-- Messages will be inserted here -->
                                 </div>
                                 <div class="dropdown-menu-footer">
-                                    <a href="{{ route('messages.index') }}" class="text-muted">Show all messages</a>
+                                    <a href="{{ route('messages.index') }}" class="text-muted">Afficher tous les messages</a>
                                 </div>
                             </div>
                         </li>
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
+                                const messageList = document.getElementById('message-list');
+                                const unreadCount = document.getElementById('unread-count');
+                                let unreadMessages = [];
+                            
                                 function fetchUnreadMessages() {
                                     fetch('/unread-messages')
                                         .then(response => response.json())
                                         .then(messages => {
-                                            const messageList = document.getElementById('message-list');
-                                            const unreadCount = document.getElementById('unread-count');
-
-                                            messageList.innerHTML = '';
-                                            unreadCount.textContent = messages.length;
-
-                                            messages.forEach(message => {
-                                                const timeDiff = new Date() - new Date(message.created_at);
-                                                const timeAgo = Math.floor(timeDiff / (1000 * 60)) + 'm ago';
-
-                                                messageList.innerHTML += `
-												<a href="#" class="list-group-item">
-													<div class="row g-0 align-items-center">
-														<div class="col-2">
-															<img src="img/avatars/avatar-2.jpg" class="avatar img-fluid rounded-circle" alt="${message.sender.name}">
-														</div>
-														<div class="col-10 ps-2">
-															<div class="text-dark">${message.sender.name} <i>${message.sender.role}</i></div>
-															<div class="text-muted small mt-1">${message.content}</div>
-															<div class="text-muted small mt-1">${timeAgo}</div>
-														</div>
-													</div>
-												</a>
-											`;
-                                            });
-                                        });
+                                            unreadMessages = messages;
+                                            updateMessageDropdown();
+                                        })
+                                        .catch(error => console.error('Error fetching messages:', error));
                                 }
-
+                            
+                                function updateMessageDropdown() {
+                                    messageList.innerHTML = '';
+                                    unreadCount.textContent = unreadMessages.length;
+                            
+                                    unreadMessages.slice(0, 5).forEach(message => {
+                                        const timeAgo = moment(message.created_at).fromNow();
+                                        let usertype = message.sender.usertype == "user" ? "Client" : "Administrateur";
+                            
+                                        const messageElement = document.createElement('a');
+                                        messageElement.href = "{{route('messages.index')}}"; // Prevent default navigation
+                                        messageElement.className = "list-group-item";
+                                        messageElement.innerHTML = `
+                                            <div class="row g-0 align-items-center">
+                                                <div class="col-2">
+                                                    <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded-circle" alt="${message.sender.name}">
+                                                </div>
+                                                <div class="col-10 ps-2">
+                                                    <div class="text-dark">${message.sender.name} <i>${usertype}</i></div>
+                                                    <div class="text-muted small mt-1">${message.content}</div>
+                                                    <div class="text-muted small mt-1">${timeAgo}</div>
+                                                </div>
+                                            </div>
+                                        `;
+                            
+                                        messageElement.addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            console.log('Message clicked:', message.id); // Debug log
+                                            markAsRead(message.id);
+                                        });
+                            
+                                        messageList.appendChild(messageElement);
+                                    });
+                                }
+                            
+                                function markAsRead(messageId) {
+                                    console.log('Marking as read:', messageId); // Debug log
+                                    fetch(`/messages/${messageId}/read`, { 
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                            'Content-Type': 'application/json',
+                                            'Accept': 'application/json'
+                                        },
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Mark as read response:', data); // Debug log
+                                        if (data.success) {
+                                            unreadMessages = unreadMessages.filter(msg => msg.id !== messageId);
+                                            updateMessageDropdown();
+                                        }
+                                    })
+                                    .catch(error => console.error('Error marking message as read:', error));
+                                }
+                            
                                 fetchUnreadMessages();
                                 setInterval(fetchUnreadMessages, 60000); // Refresh every minute
                             });
-                        </script>
+                            </script>
                         <li class="nav-item dropdown">
                             <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#"
                                 data-bs-toggle="dropdown">
@@ -192,7 +244,7 @@
                                 <div class="dropdown-divider"></div>
                                 <form action="/logout" method="POST">
                                     @csrf
-                                    <button class="dropdown-item">Log out</button>
+                                    <button class="dropdown-item">Déconnexion</button>
                                 </form>
                             </div>
                         </li>
@@ -292,7 +344,7 @@
 											@foreach($clients as $client)
 											<tr>
 												<td>{{ $client->name }}</td>
-												<td>{{ $client->adress }}</td>
+												<td>{{ $client->address }}</td>
 												<td>{{ $client->tel }}</td>
 												<td>{{ $client->invoices_count }}</td>
 											</tr>
@@ -372,6 +424,7 @@
 												<td>{{ $quote->id }}</td>
 												<td>{{ $quote->client->name }}</td>
 												<td>{{ $quote->companyinfo->name }}</td>
+                                                <td>{{ number_format($quote->total_amount, 2) }} DH</td>												
                                                 <td>{{ $quote->date instanceof \Carbon\Carbon ? $quote->date->format('d/m/Y') : $quote->date }}</td>
                                                 <td>{{ $quote->due_date instanceof \Carbon\Carbon ? $quote->due_date->format('d/m/Y') : $quote->due_date }}</td>
 												<td>
@@ -414,10 +467,17 @@
 													</div>
 												</div>
 												<h1 class="mt-1 mb-3">{{ $totalInvoices }}</h1>
+                                                @if ($invoiceGrowth>0)
 												<div class="mb-0">
 													<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $invoiceGrowth }}% </span>
 													<span class="text-muted">Depuis le mois dernier</span>
 												</div>
+                                                @else
+                                                <div class="mb-0">
+													<span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $invoiceGrowth }}% </span>
+													<span class="text-muted">Depuis le mois dernier</span>
+												</div>
+                                                @endif
 											</div>
 										</div>
 										<div class="card">
@@ -433,10 +493,17 @@
 													</div>
 												</div>
 												<h1 class="mt-1 mb-3">{{ number_format($totalPaidAmount, 2) }} DH</h1>
-												<div class="mb-0">
+												@if ($paidGrowth>0)
+                                                <div class="mb-0">
 													<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $paidGrowth }}% </span>
 													<span class="text-muted">Depuis le mois dernier</span>
 												</div>
+                                                @else
+                                                <div class="mb-0">
+													<span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $paidGrowth }}% </span>
+													<span class="text-muted">Depuis le mois dernier</span>
+												</div>
+                                                @endif
 											</div>
 										</div>
 									</div>
@@ -454,10 +521,17 @@
 													</div>
 												</div>
 												<h1 class="mt-1 mb-3">{{ number_format($totalUnpaidAmount, 2) }} DH</h1>
-												<div class="mb-0">
+												@if ($unpaidGrowth>=0)
+                                                <div class="mb-0">
 													<span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $unpaidGrowth }}% </span>
 													<span class="text-muted">Depuis le mois dernier</span>
 												</div>
+                                                @else
+                                                <div class="mb-0">
+													<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $unpaidGrowth }}% </span>
+													<span class="text-muted">Depuis le mois dernier</span>
+												</div>
+                                                @endif
 											</div>
 										</div>
 										<div class="card">
@@ -473,10 +547,17 @@
 													</div>
 												</div>
 												<h1 class="mt-1 mb-3">{{ number_format($averageInvoiceValue, 2) }} DH</h1>
-												<div class="mb-0">
+												@if ($averageGrowth>0)
+                                                <div class="mb-0">
 													<span class="text-success"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $averageGrowth }}% </span>
 													<span class="text-muted">Depuis le mois dernier</span>
 												</div>
+                                                @else
+                                                <div class="mb-0">
+													<span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i> {{ $averageGrowth }}% </span>
+													<span class="text-muted">Depuis le mois dernier</span>
+												</div>
+                                                @endif
 											</div>
 										</div>
 									</div>
@@ -498,36 +579,37 @@
 						</div>
 					</div>
 			
-					<div class="row">
-						<div class="col-12 col-md-6 col-xxl-3 d-flex order-2 order-xxl-3">
-							<div class="card flex-fill w-100">
-								<div class="card-header">
-									<h5 class="card-title mb-0">Statut des Factures</h5>
-								</div>
-								<div class="card-body d-flex">
-									<div class="align-self-center w-100">
-										<div class="py-3">
-											<div class="chart chart-xs">
-												<canvas id="chartjs-dashboard-pie"></canvas>
-											</div>
-										</div>
-										<table class="table mb-0">
-											<tbody>
-												<tr>
-													<td>Payées</td>
-													<td class="text-end">{{ $paidPercentage }}%</td>
-												</tr>
-												<tr>
-													<td>Non Payées</td>
-													<td class="text-end">{{ $unpaidPercentage }}%</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+					<div class="row justify-content-center">
+                        <div class="col-12 col-md-6 col-xxl-3 d-flex order-2 order-xxl-3 mx-auto">
+                            <div class="card flex-fill w-100">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Statut des Factures</h5>
+                                </div>
+                                <div class="card-body d-flex">
+                                    <div class="align-self-center w-100">
+                                        <div class="py-3">
+                                            <div class="chart chart-xs">
+                                                <canvas id="chartjs-dashboard-pie"></canvas>
+                                            </div>
+                                        </div>
+                                        <table class="table mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Payées</td>
+                                                    <td class="text-end">{{ $paidPercentage }}%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Non Payées</td>
+                                                    <td class="text-end">{{ $unpaidPercentage }}%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
 				</div>
 			</main>
 
@@ -558,61 +640,65 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");
-    var gradient = ctx.createLinearGradient(0, 0, 0, 225);
-    gradient.addColorStop(0, "rgba(215, 227, 244, 1)");
-    gradient.addColorStop(1, "rgba(215, 227, 244, 0)");
-    
-    new Chart(document.getElementById("chartjs-dashboard-line"), {
-        type: "line",
-        data: {
-            labels: {!! json_encode(array_keys($monthlyRevenue)) !!},
-            datasets: [{
-                label: "Revenus (DH)",
-                fill: true,
-                backgroundColor: gradient,
-                borderColor: window.theme.primary,
-                data: {!! json_encode(array_values($monthlyRevenue)) !!}
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            legend: {
-                display: false
-            },
-            tooltips: {
-                intersect: false
-            },
-            hover: {
-                intersect: true
-            },
-            plugins: {
-                filler: {
-                    propagate: false
-                }
-            },
-            scales: {
-                xAxes: [{
-                    reverse: true,
-                    gridLines: {
-                        color: "rgba(0,0,0,0.0)"
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        stepSize: 1000
+            var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");
+            var gradient = ctx.createLinearGradient(0, 0, 0, 225);
+            gradient.addColorStop(0, "rgba(215, 227, 244, 1)");
+            gradient.addColorStop(1, "rgba(215, 227, 244, 0)");
+            
+            var monthlyRevenue = @json($monthlyRevenue);
+            var labels = Object.keys(monthlyRevenue);
+            var data = Object.values(monthlyRevenue);
+        
+            new Chart(document.getElementById("chartjs-dashboard-line"), {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Revenus (DH)",
+                        fill: true,
+                        backgroundColor: gradient,
+                        borderColor: window.theme.primary,
+                        data: data
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
                     },
-                    display: true,
-                    borderDash: [3, 3],
-                    gridLines: {
-                        color: "rgba(0,0,0,0.0)"
+                    tooltips: {
+                        intersect: false
+                    },
+                    hover: {
+                        intersect: true
+                    },
+                    plugins: {
+                        filler: {
+                            propagate: false
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            reverse: true,
+                            gridLines: {
+                                color: "rgba(0,0,0,0.0)"
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                stepSize: 1000
+                            },
+                            display: true,
+                            borderDash: [3, 3],
+                            gridLines: {
+                                color: "rgba(0,0,0,0.0)"
+                            }
+                        }]
                     }
-                }]
-            }
-        }
-    });
-});
-    </script>
+                }
+            });
+        });
+        </script>
     <script>
     document.addEventListener("DOMContentLoaded", function() {
     new Chart(document.getElementById("chartjs-dashboard-pie"), {
@@ -632,8 +718,15 @@
             responsive: !window.MSInputMethodContext,
             maintainAspectRatio: false,
             legend: {
-                display: false
-            },
+                    display: true, // Enable the legend
+                    position: 'bottom', // Position of the legend (bottom, top, left, right)
+                    labels: {
+                        boxWidth: 20, // Width of the color box
+                        padding: 15,  // Padding between legend items
+                        fontSize: 14, // Font size for legend text
+                        fontColor: '#333', // Font color for legend text
+                    }
+                },
             cutoutPercentage: 75
         }
     });

@@ -1,6 +1,8 @@
 @extends('template')
+@section('title', 'Ajouter un devis')
+<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
-@section('contenu')
+@section('content')
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
@@ -22,10 +24,8 @@
                         <div class="mb-3">
                             <label for="client_id" class="form-label">Client</label>
                             <select class="form-control" id="client_id" name="client_id" required>
-                                <option value=""></option>
-                                @foreach ($client as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                @endforeach
+                                <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                
                             </select>
                         </div>
 
