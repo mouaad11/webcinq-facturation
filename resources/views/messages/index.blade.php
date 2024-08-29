@@ -2,7 +2,6 @@
 
 
 @section('title', 'Tous les messages') 
-<link rel="shortcut icon" href="../../img/icons/icon-48x48.png" />
 
 @section('content')
 <div class="container">

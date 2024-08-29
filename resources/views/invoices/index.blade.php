@@ -2,12 +2,15 @@
 
 
 @section('title', 'Toutes les Factures')  <!-- This will set the page title -->
-<link rel="shortcut icon" href="../../img/icons/icon-48x48.png" />
 
 @section('content')
 <div class="container-fluid p-0">
     <h1 class="h3 mb-3"><strong>Toutes les Factures</strong></h1>
-
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -15,10 +18,19 @@
                     <h5 class="card-title mb-0">Liste des Factures</h5>
                 </div>
                 <div class="card-body">
+                    <label for="filter-type" class="form-label">Filtrer par type</label>
+                    <select class="form-control" id="filter-type">
+                        <option value="">Tous</option>
+                        <option value="envoyée">Envoyée</option>
+                        <option value="reçu">Reçu</option>
+                    </select>
+                </div>
+                <div class="card-body">
                     <table class="table table-hover my-0">
                         <thead>
                             <tr>
-                                <th>Numéro de Facture</th>
+                                <th>Numéro</th>
+                                <th>Type</th>
                                 <th>Client</th>
                                 <th>Entreprise</th>
                                 <th>Montant</th>
@@ -32,6 +44,7 @@
                             @foreach($invoices as $invoice)
                             <tr>
                                 <td>{{ $invoice->id }}</td>
+                                <td>{{ $invoice->type }}</td>
                                 <td>{{ $invoice->client->name }}</td>
                                 <td>{{ $invoice->companyinfo->name }}</td>
                                 <td>{{ number_format($invoice->total_amount, 2) }} DH</td>
@@ -60,4 +73,20 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#filter-type').on('change', function() {
+        var type = $(this).val();
+        if (type) {
+            $('table tbody tr').hide();
+            $('table tbody tr').filter(function() {
+                return $(this).find('td:eq(1)').text().trim() === type;
+            }).show();
+        } else {
+            $('table tbody tr').show();
+        }
+    });
+});
+</script>
 @endsection

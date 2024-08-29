@@ -92,9 +92,10 @@ class devis_contr extends Controller
         // Fetch clients from the database
     $client = auth()->user()->client; // Assuming you have a Client model
     $companyinfo=companyinfo::all();
+    $allClients = Client::all();
 
     // Pass the clients to the view
-        return view('devis_form_client',compact('client','companyinfo'));
+        return view('devis_form_client',compact('client','companyinfo','allClients'));
     }
 
 
@@ -275,7 +276,19 @@ public function update(Request $request, $id)
 }
  public function index()
 {
-    $devisList = Devis::with('client')->get(); // Fetch the list of devis with client details
-    $devis = Devis::all(); // or paginate, etc.
+    $devisList = Devis::with('client')->get()
+    ->map(function ($quote) {
+        // Check if the quote has been converted to an invoice (meaning it's accepted)
+        $isAccepted = devis::where('id', $quote->id)
+            ->where('client_id', $quote->client_id)
+            ->where('status', 1)
+            ->exists();
+
+        $quote->status = $isAccepted ? 'Accepté' : 'Non Accepté';
+        return $quote;
+    }); // Fetch the list of devis with client details
+    $devis = Devis::all();
+    
+     // or paginate, etc.
     return view('devis.index', compact('devis', 'devisList'));
 }}

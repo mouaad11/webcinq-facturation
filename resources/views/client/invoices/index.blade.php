@@ -1,4 +1,4 @@
-@extends('template')
+@extends('nav-client')
 
 @section('title','Factures')
 <link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
@@ -12,7 +12,7 @@
     <div class="alert alert-success">
         {{ session('success') }}
     </div>
-@endif
+    @endif
 
     <div class="row">
         <div class="col-12">

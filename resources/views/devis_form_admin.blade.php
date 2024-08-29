@@ -1,6 +1,5 @@
 @extends('template')
 @section('title', 'Ajouter un devis')
-<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
 @section('content')
 <div class="container">

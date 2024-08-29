@@ -15,12 +15,15 @@ class profile_contr extends Controller
 {
 
 
-    function setting(){
-
+    public function setting()
+{
+    if (Auth::user()->isClient()) {
+        return view('settingClient');
+    } elseif (Auth::user()->isAdmin()) {
         return view('setting');
-
-
     }
+}
+
 
 
 

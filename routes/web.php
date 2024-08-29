@@ -15,6 +15,7 @@ use App\Http\Controllers\profile_contr;
 use App\Http\Controllers\sign_up_contr;
 use App\Http\Middleware\ClientMiddleware;
 use App\Http\Controllers\MessageController;
+use App\Http\Requests\sign_up_request;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -36,14 +37,33 @@ Route::get('/dashboard', [admin_contr::class, 'index'])->middleware(['auth', 'ad
 Route::middleware(['auth'])->group(function () {
     Route::get('/client/dashboard', [client_contr::class, 'dashboard'])->name('client.dashboard');
     Route::get('/client/invoices', [client_contr::class, 'invoicesIndex'])->name('client.invoices.index');
-    Route::get('/client/devis', [client_contr::class, 'devisIndex'])->name('client.devis.index');
-    Route::post('/client/devis/{id}/accept', [client_contr::class, 'devisAccept'])->name('client.devis.accept');
+    //Route::get('/client/devis', [client_contr::class, 'devisIndex'])->name('client.devis.index');
+    //Route::post('/devis/{id}/accept', [client_contr::class, 'devisAccept'])->name('client.devis.accept');
 });
 
 
 // Sign up
 Route::get('/sign_up', [sign_up_contr::class, 'sign_up'])->name('sign_up');
-Route::post('/sign_up', [sign_up_contr::class, 'do_sign_up'])->name('do_sign_up');
+Route::post('/sign_up', function (sign_up_request $request) {
+    // Check if the user is authenticated
+    if (!Auth::check()) {
+        // No user is authenticated, call the 'do_sign_up_user' function in sign_up_contr
+        return App::make(sign_up_contr::class)->do_sign_up_user($request);
+    }
+
+    $user = Auth::user();
+
+    // Check if the user is a client
+    if ($user->isClient()) {
+        return App::make(sign_up_contr::class)->do_sign_up_user($request);
+    }
+
+    // If the user is an admin, call the 'do_sign_up' function in sign_up_contr
+    if ($user->isAdmin()) {
+        return App::make(sign_up_contr::class)->do_sign_up($request);
+    }
+
+});
 
 // Login & logout
 Route::get('/login', [login_contr::class, 'login'])->name('login');
@@ -56,8 +76,8 @@ Route::get('/setting', [profile_contr::class, 'setting'])->middleware('auth');
 Route::post('/setting.update', [profile_contr::class, 'update'])->name('setting.update');
 
 // Admin routes
-Route::match(['get', 'post'], '/admin_list_acc', [admin_contr::class, 'admin_list_acc'])->name('admin_list_acc');
-Route::post('/admin_list_acc/search', [admin_contr::class, 'search_users_email'])->name('search_users_email');
+Route::match(['get', 'post'], '/validation', [admin_contr::class, 'admin_list_acc'])->name('admin_list_acc');
+Route::post('/validation/recherche', [admin_contr::class, 'search_users_email'])->name('search_users_email');
 Route::post('/account/update/{user}', [admin_contr::class, 'account_update'])->name('account_update');
 Route::post('/account/do_update/{user}', [admin_contr::class, 'do_update'])->name('do_update');
 Route::post('/delete_account/{user}', [admin_contr::class, 'delete_account'])->name('delete_account');
@@ -99,6 +119,7 @@ Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']
 
 // Show more table routes
 Route::get('/invoices/{id}', [invoice_contr::class, 'show'])->name('invoices.show');
+Route::get('/invoices/client/{id}', [invoice_contr::class, 'showID'])->name('client.show');
 Route::match(['get', 'post'], '/invoices/{id}/edit', [invoice_contr::class, 'edit'])->name('invoices.edit');
 Route::get('/invoices', [invoice_contr::class, 'index'])->name('invoices.index');
 Route::get('/clients', [client_contr::class, 'indexShowAll'])->name('clients.indexShowAll');

@@ -20,6 +20,6 @@ class AdminMiddleware
             return $next($request);
         }
 
-        return redirect()->route('home')->with('error', 'You do not have access to this section.');
+        return redirect()->route('client.dashboard')->with('error', 'You do not have access to this section.');
     }
 }

@@ -1,7 +1,6 @@
 @extends('template')
 
 @section('title', 'Tous les Clients')
-<link rel="shortcut icon" href="../../img/icons/icon-48x48.png" />
 
 @section('content')
 <div class="container-fluid p-0">
@@ -34,7 +33,7 @@
                                 <td>{{ $client->user->email }}</td>
                                 <td>{{ $client->invoices_count }}</td>
                                 <td>
-                                   
+                                    <a href="{{ route('client.show', $client->id) }}" class="btn btn-sm btn-primary">Voir</a>
                                     <a href="{{ route('admin_client', $client->user_id) }}" class="btn btn-sm btn-warning">Modifier</a>
                                     <form action="{{ route('clients.destroy', $client->id) }}" method="POST" style="display:inline;">
                                         @csrf

@@ -1,4 +1,4 @@
-@extends('template')
+@extends('nav-client')
 
 @section('title', 'Profil')
 

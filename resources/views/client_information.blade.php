@@ -2,7 +2,6 @@
 @extends('template')
 
 @section('title', 'Modifier les informations du client') 
-<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
 @section('content')
    

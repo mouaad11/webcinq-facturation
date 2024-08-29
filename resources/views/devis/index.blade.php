@@ -1,7 +1,6 @@
 @extends('template')
 
 @section('title', 'Tous les Devis')
-<link rel="shortcut icon" href="../../img/icons/icon-48x48.png" />
 
 @section('content')
 <div class="container-fluid p-0">
@@ -10,6 +9,16 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+                @endif
+                @if(session('error'))
+                <div class="alert alert-error">
+                    {{ session('error') }}
+                </div>
+                @endif
                 <div class="card-header">
                     <h5 class="card-title mb-0">Liste des Devis</h5>
                 </div>
@@ -22,6 +31,7 @@
                                 <th>Entreprise</th>
                                 <th>Montant</th>
                                 <th>Date</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -34,7 +44,20 @@
                                 <td>{{ number_format($quote->total_amount, 2) }} DH</td>
                                 <td>{{ $quote->date instanceof \Carbon\Carbon ? $quote->date->format('d/m/Y') : $quote->date }}</td>
                                 <td>
+                                    @if ($quote->status == 'Accepté')
+                                        <span class="badge bg-success">{{ $quote->status }}</span>
+                                    @else
+                                        <span class="badge bg-danger">{{ $quote->status }}</span>
+                                    @endif
+                                </td>
+                                <td>
                                     <a href="{{ route('detail_devis', ['type' => 'sent', 'id' => $quote->id]) }}" class="btn btn-sm btn-primary">Voir</a>
+                                    @if ($quote->status == 'Non Accepté')
+                                    <form action="{{ route('client.devis.accept', $quote->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Êtes-vous sûr de vouloir accepter ce devis?')">Accepter</button>
+                                    </form>
+                                    @endif
                                     <a href="{{ route('devis.edit', $quote->id) }}" class="btn btn-sm btn-warning">Modifier</a>
                                     <form action="{{ route('devis.destroy', $quote->id) }}" method="POST" style="display:inline;">
                                         @csrf

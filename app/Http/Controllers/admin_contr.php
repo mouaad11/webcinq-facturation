@@ -22,18 +22,23 @@ use Carbon\Carbon;
 class admin_contr extends Controller
 {
     public function index()
-    {
-        $recentInvoices = Invoice::with(['client', 'companyinfo', 'invoice_items'])
+{
+    $recentInvoices = Invoice::with(['client', 'companyinfo', 'invoice_items'])
+        ->where('type', 'envoyée')
         ->latest()
         ->take(7)
         ->get();
 
-    $clients = Client::withCount('invoices')
+    $clients = Client::withCount(['invoices' => function ($query) {
+        $query->where('type', 'envoyée');
+    }])
         ->orderByDesc('invoices_count')
         ->take(7)
         ->get();
 
-    $companies = Companyinfo::withCount('invoices')
+    $companies = Companyinfo::withCount(['invoices' => function ($query) {
+        $query->where('type', 'envoyée');
+    }])
         ->orderByDesc('invoices_count')
         ->take(7)
         ->get();
@@ -41,28 +46,38 @@ class admin_contr extends Controller
     $recentQuotes = Devis::with(['client', 'companyinfo', 'devis_items'])
         ->latest()
         ->take(7)
-        ->get();
+        ->get()
+        ->map(function ($quote) {
+            // Check if the quote has been converted to an invoice (meaning it's accepted)
+            $isAccepted = devis::where('id', $quote->id)
+                ->where('client_id', $quote->client_id)
+                ->where('status', 1)
+                ->exists();
+    
+            $quote->status = $isAccepted ? 'Accepté' : 'Non Accepté';
+            return $quote;
+        });
 
-    $totalInvoices = Invoice::count();
-    $totalPaidAmount = Invoice::where('status', 'paid')->sum('total_amount');
-    $totalUnpaidAmount = Invoice::where('status', 'unpaid')->sum('total_amount');
-    $averageInvoiceValue = Invoice::avg('total_amount');
+    $totalInvoices = Invoice::where('type', 'envoyée')->count();
+    $totalPaidAmount = Invoice::where('type', 'envoyée')->where('status', 'paid')->sum('total_amount');
+    $totalUnpaidAmount = Invoice::where('type', 'envoyée')->where('status', 'unpaid')->sum('total_amount');
+    $averageInvoiceValue = Invoice::where('type', 'envoyée')->avg('total_amount');
 
     // Calculate growth percentages (you might want to adjust the time period)
     $lastMonth = Carbon::now()->subMonth();
-    $invoiceGrowth = $this->calculateGrowth(Invoice::class, $lastMonth);
-    $paidGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['status' => 'paid']);
-    $unpaidGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['status' => 'unpaid']);
-    $averageGrowth = $this->calculateAverageGrowth(Invoice::class, $lastMonth);
+    $invoiceGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['type' => 'envoyée']);
+    $paidGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['type' => 'envoyée', 'status' => 'paid']);
+    $unpaidGrowth = $this->calculateGrowth(Invoice::class, $lastMonth, ['type' => 'envoyée', 'status' => 'unpaid']);
+    $averageGrowth = $this->calculateAverageGrowth(Invoice::class, $lastMonth, ['type' => 'envoyée']);
 
     // Calculate percentages for pie chart
-    $totalInvoiceCount = Invoice::count();
-    $paidCount = Invoice::where('status', 'paid')->count();
+    $totalInvoiceCount = Invoice::where('type', 'envoyée')->count();
+    $paidCount = Invoice::where('type', 'envoyée')->where('status', 'paid')->count();
     $paidPercentage = ($totalInvoiceCount > 0) ? round(($paidCount / $totalInvoiceCount) * 100, 2) : 0;
     $unpaidPercentage = 100 - $paidPercentage;
 
     // Get monthly revenue data for line chart
-    $monthlyRevenue = $this->getMonthlyRevenue();
+    $monthlyRevenue = $this->getMonthlyRevenue(['type' => 'envoyée']);
 
     return view('dashboard', compact(
         'recentInvoices',
@@ -81,9 +96,7 @@ class admin_contr extends Controller
         'unpaidPercentage',
         'monthlyRevenue'
     ));
-    return view('dashboard'); // Ensure you have a view at resources/views/admin/dashboard.blade.php
-
-    }
+}
     private function calculateGrowth($model, $date, $conditions = [])
 {
     $currentCount = $model::where($conditions)->count();
@@ -115,7 +128,8 @@ private function getMonthlyRevenue()
 
     for ($i = 0; $i < 12; $i++) {
         $month = $startDate->copy()->addMonths($i);
-        $revenue = Invoice::whereYear('date', $month->year)
+        $revenue = Invoice::where('type', 'envoyée')
+                          ->whereYear('date', $month->year)
                           ->whereMonth('date', $month->month)
                           ->sum('total_amount');
 

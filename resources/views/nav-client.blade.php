@@ -1,51 +1,54 @@
+<!-- nav-client.blade.php -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Responsive Admin &amp; Dashboard Template based on Bootstrap 5">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Tableau de bord client Webcinq">
+    <meta name="author" content="Webcinq">
+
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="shortcut icon" href="img/icons/icon-48x48.png" />
-    <link rel="canonical" href="https://demo-basic.adminkit.io/" />
+    <link rel="shortcut icon" href="../../img/icons/icon-48x48.png" />
+
+    <title>@yield('title', 'Webcinq - Tableau de bord Client')</title>
+
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    
     <div class="wrapper">
         <nav id="sidebar" class="sidebar js-sidebar">
             <div class="sidebar-content js-simplebar">
-                <a class="sidebar-brand" href="{{ '/dashboard' }}">
+                <a class="sidebar-brand" href="{{ '/client-dashboard' }}">
                     <img src="{{ asset('/webcinq_logo.png') }}" height="40" alt="webcinq" loading="lazy" />
-
-                    <span class="align-bottom">Admin</span>
+                    <span class="align-bottom">Client</span>
                 </a>
 
                 <ul class="sidebar-nav">
                     <li class="sidebar-header">
-                        Pages
+                        Menu
                     </li>
 
                     <li class="sidebar-item active">
-                        <a class="sidebar-link" href="{{route('dashboard')}}">
+                        <a class="sidebar-link" href="{{ '/client-dashboard' }}">
                             <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Tableau de
                                 bord</span>
                         </a>
                     </li>
 
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{route('setting')}}">
+                        <a class="sidebar-link" href="{{ route('setting') }}">
                             <i class="align-middle" data-feather="user"></i> <span class="align-middle">Profil</span>
                         </a>
                     </li>
 
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('logout') }}">
-                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Se déconnecter</span>
+                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Se
+                                déconnecter</span>
                         </a>
                     </li>
 
@@ -56,56 +59,26 @@
                         </a>
                     </li>
 
+
+
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('admin_list_acc') }}">
-                            <i class="align-middle" data-feather="book"></i> <span class="align-middle">Demandes de
-                                validation du compte</span>
+                        <a class="sidebar-link" href="{{ route('client.invoices.index') }}">
+                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des
+                                factures</span>
                         </a>
                     </li>
 
 
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('invoice_form') }}">
-                            <i class="align-middle me-2" data-feather="edit"></i> <span class="align-middle">Ajouter une facture</span>
-                        </a>
-                    </li>
-
-					<li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('devis_form_client') }}">
-                            <i class="align-middle me-2" data-feather="edit"></i> <span class="align-middle">Ajouter un devis</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('clients.indexShowAll') }}">
-                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des clients</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('company_info') }}">
-                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des entreprises</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('invoices.index') }}">
-                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des factures</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('devis.index') }}">
-                            <i class="align-middle me-2" data-feather="list"></i> <span class="align-middle">Liste des devis</span>
-                        </a>
-                    </li>
                 </ul>
 
                 <div class="sidebar-cta">
                     <div class="sidebar-cta-content">
                         <strong class="d-inline-block mb-2">Visiter notre site web</strong>
                         <div class="mb-3 text-sm">
-                            Vous voulez d'autres services et solutions digiteles? visitez notre site web.
+                            Vous voulez d'autres services et solutions digitales? Visitez notre site web.
                         </div>
                         <div class="d-grid">
-                            <a href="https://webcinq.com/" target=”_blank” class="btn btn-primary">Webcinq</a>
+                            <a href="https://webcinq.com/" target="_blank" class="btn btn-primary">Webcinq</a>
                         </div>
                     </div>
                 </div>
@@ -113,7 +86,7 @@
         </nav>
 
         <div class="main">
-            <nav class="navbar sticky-top navbar-expand navbar-light navbar-bg">
+            <nav class="navbar navbar-expand navbar-light navbar-bg">
                 <a class="sidebar-toggle js-sidebar-toggle">
                     <i class="hamburger align-self-center"></i>
                 </a>
@@ -198,7 +171,7 @@
     </div>
 
     <script src="/js/app.js"></script>
-    
+    @yield('scripts')
 </body>
 
 </html>

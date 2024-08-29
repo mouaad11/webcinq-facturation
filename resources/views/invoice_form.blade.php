@@ -1,6 +1,5 @@
 @extends('template')
 @section('title', 'Ajouter une facture')
-<link rel="shortcut icon" href="../img/icons/icon-48x48.png" />
 
 @section('content')
 
@@ -17,6 +16,13 @@
                     @endif
                     <form action="{{route('save_invoice_admin')}}" method="POST">
                         @csrf
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type de facture</label>
+                            <select class="form-control" id="type" name="type" required>
+                                <option value="envoyée">Envoyée</option>
+                                <option value="reçu">Reçu</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label for="date" class="form-label">Date</label>
                             <input type="date" class="form-control" id="date" value="{{ \Carbon\Carbon::today()->toDateString() }}" name="date" required>
