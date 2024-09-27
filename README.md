@@ -1,66 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel APP - Invoice and Quotation Management 🚀💻
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview 📖
 
-## About Laravel
+This **Laravel-based web application** is designed to simplify the management of invoices and quotations for businesses. It provides a streamlined solution for companies that need a robust and user-friendly platform for handling their invoicing and quotations.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 🌟 Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Admin Dashboard**: Full control over users, clients, quotations, and invoices.
+- **Client Dashboard**: Clients can easily consult, accept, or reject quotations and view their invoice history.
+- **Internal User**: Allows employees or accountants to generate and manage invoices and quotations.
+- **Responsive Design**: Accessible on all devices—desktop, tablet, and mobile.
+- **Role-Based Access**: Three distinct roles (Admin, Client, Internal User) with tailored access rights.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Demo Video 🎥
+Feel free to check the demo video and explore the app in action!
 
-## Learning Laravel
+🔗 [Demo Video](#) 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Getting Started 🚀
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Prerequisites ✅
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **PHP 8.0+**
+- **Composer**
+- **MySQL**
+- **Node.js & npm**
+- **Laravel Framework**
 
-## Laravel Sponsors
+### Installation ⚙️
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/laravel-invoice-app.git
+   cd laravel-invoice-app
 
-### Premium Partners
+2. Install dependencies:
+    ```bash
+    composer install
+    npm install
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+3. Create a .env file:
+    ```bash
+    cp .env.example .env
 
-## Contributing
+4. Generate an application key:
+    ```bash
+    php artisan key:generate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Run database migrations:
+    ```bash
+    php artisan migrate
 
-## Code of Conduct
+6. Start the development server:
+    ```bash
+    php artisan serve
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+7. Compile assets:
+    ```bash
+    npm run dev
+You're now ready to use the Laravel Invoice App! 🎉
 
-## Security Vulnerabilities
+## Contributing 🤝
+Feel free to submit issues and pull requests. Contributions are always welcome!
+-----------------------------------------------------------------------------------
+# Application Laravel - Gestion des Factures et Devis 🚀💻
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Aperçu 📖
 
-## License
+Cette **application web basée sur Laravel** est conçue pour simplifier la gestion des factures et des devis pour les entreprises. Elle offre une solution rationalisée pour les sociétés ayant besoin d'une plateforme robuste et conviviale pour gérer leur facturation et leurs devis.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 🌟 Fonctionnalités Principales
+
+- **Tableau de bord Administrateur** : Contrôle total sur les utilisateurs, les clients, les devis et les factures.
+- **Tableau de bord Client** : Les clients peuvent facilement consulter, accepter ou rejeter les devis et voir l'historique de leurs factures.
+- **Utilisateur Interne** : Permet aux employés ou aux comptables de générer et gérer les factures et les devis.
+- **Design Responsive** : Accessible sur tous les appareils — ordinateur de bureau, tablette et mobile.
+- **Accès Basé sur les Rôles** : Trois rôles distincts (Admin, Client, Utilisateur Interne) avec des droits d'accès adaptés.
+
+## Vidéo de Démonstration 🎥
+
+N'hésitez pas à consulter la vidéo de démonstration et à explorer l'application en action !
+
+🔗 [Vidéo de Démonstration](#)
+
+## Pour Commencer 🚀
+
+### Prérequis ✅
+
+- **PHP 8.0+**
+- **Composer**
+- **MySQL**
+- **Node.js & npm**
+- **Framework Laravel**
+
+### Installation ⚙️
+
+1. **Cloner le dépôt** :
+   ```bash
+   git clone https://github.com/votrenomdutilisateur/laravel-invoice-app.git
+   cd laravel-invoice-app
+   ```
+
+2. **Installer les dépendances** :
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Créer un fichier .env** :
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Générer une clé d'application** :
+   ```bash
+   php artisan key:generate
+   ```
+
+5. **Exécuter les migrations de la base de données** :
+   ```bash
+   php artisan migrate
+   ```
+
+6. **Démarrer le serveur de développement** :
+   ```bash
+   php artisan serve
+   ```
+
+7. **Compiler les assets** :
+   ```bash
+   npm run dev
+   ```
+
+Vous êtes maintenant prêt à utiliser l'Application Laravel de Gestion des Factures ! 🎉
+
+## Contribuer 🤝
+
+N'hésitez pas à soumettre des problèmes et des pull requests. Les contributions sont toujours les bienvenues !
